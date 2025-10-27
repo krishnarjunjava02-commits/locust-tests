@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-master
+  namespace: gdx-invt-perf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust-master
+  template:
+    metadata:
+      labels:
+        app: locust-master
+    spec:
+      containers:
+      - name: locust-master
+        image: locustio/locust:2.20.0
+        args: ["-f", "/mnt/locust/locustfile.py", "--master"]
+        ports:
+        - containerPort: 8089
+        volumeMounts:
+        - name: locust-scripts
+          mountPath: /mnt/locust
+      volumes:
+      - name: locust-scripts
+        configMap:
+          name: locust-scripts
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-master
+  namespace: gdx-invt-perf 
+spec:
+  selector:
+    app: locust-master
+  ports:
+    - port: 8089
+      targetPort: 8089
+  type: LoadBalancer
