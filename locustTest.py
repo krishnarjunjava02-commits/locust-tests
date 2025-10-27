@@ -2,6 +2,7 @@ from locust import HttpUser, task, between
 
 class TricentisUser(HttpUser):
     wait_time = between(1, 5)
+    host = "https://tricentis.com"
 
     @task(2)
     def load_home(self):
